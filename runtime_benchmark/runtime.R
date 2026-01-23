@@ -73,16 +73,23 @@ write.csv(timings, "runtime_benchmark/timings.csv")
 
 library(ggplot2)
 
-ggplot(
+timings <- read.csv("runtime_benchmark/timings.csv")
+
+p1 <- ggplot(
     data = timings, 
     aes(x = dataset, y = user, group = package, color = package)
 ) + 
 geom_point() +
 geom_line()
 
-ggplot(
+ggsave( "runtime_benchmark/user_time.png", p1)
+
+p2 <- ggplot(
     data = timings, 
     aes(x = dataset, y = elapsed, group = package, color = package)
 ) + 
 geom_point() +
 geom_line()
+p2
+
+ggsave("runtime_benchmark/elapsed_time.png", p2)
