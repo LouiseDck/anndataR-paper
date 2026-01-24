@@ -1,0 +1,314 @@
+%%
+%% Copyright 2022 OXFORD UNIVERSITY PRESS
+%%
+%% This file is part of the 'oup-authoring-template Bundle'.
+%% ---------------------------------------------
+%%
+%% It may be distributed under the conditions of the LaTeX Project Public
+%% License, either version 1.2 of this license or (at your option) any
+%% later version.  The latest version of this license is in
+%%    http://www.latex-project.org/lppl.txt
+%% and version 1.2 or later is part of all distributions of LaTeX
+%% version 1999/12/01 or later.
+%%
+%% The list of all files belonging to the 'oup-authoring-template Bundle' is
+%% given in the file `manifest.txt'.
+%%
+%% Template article for OXFORD UNIVERSITY PRESS's document class `oup-authoring-template'
+%% with bibliographic references
+%%
+
+%%%CONTEMPORARY%%%
+% \documentclass[numsec,webpdf,modern,large]{oup-authoring-template}
+% \documentclass[unnumsec,webpdf,contemporary,large]{oup-authoring-template}%
+\documentclass[numsec,webpdf,modern,large,namedate]{oup-authoring-template}
+% \documentclass[unnumsec,webpdf,modern,large,namedate]{oup-authoring-template}% uncomment this line for author year citations and comment the above
+
+\newcommand\mydots{\ifmmode\ldots\else\makebox[1em][c]{.\hfil.\hfil.}\fi}
+\def\thickhline{\noalign{\hrule height.8pt}}
+
+\usepackage{tablefootnote}
+\usepackage{amssymb} % checkmark
+\usepackage{cuted}
+\usepackage{microtype}
+\usepackage{xr}
+
+\externaldocument[supp-]{supplementary}
+
+\setcitestyle{round}
+
+\begin{document}
+
+\journaltitle{Journal Title Here}
+\DOI{DOI HERE}
+\copyrightyear{2022}
+\pubyear{2019}
+\access{Advance Access Publication Date: Day Month Year}
+\appnotes{Paper}
+
+\firstpage{1}
+
+%\subtitle{Subject Section}
+
+\title[]{anndataR improves interoperability between R and Python in single-cell transcriptomics}
+
+\author[1,2,\textsuperscript{\textdagger}]{Louise Deconinck\ORCID{0000-0001-8100-6823}}
+\author[3,\textsuperscript{\textdagger}]{Luke Zappia\ORCID{0000-0001-7744-8565}}
+\author[1,2,3\textsuperscript{\textdagger}$\ast$]{Robrecht Cannoodt\ORCID{0000-0003-3641-729X}}
+\author[4]{Martin Morgan\ORCID{0000-0002-5874-8148}}
+\author[]{scverse core}
+\author[5,6]{Isaac Virshup\ORCID{0000-0002-1710-8945}}
+\author[1,2]{Chananchida Sang-Aram\ORCID{0000-0002-0922-0822}}
+\author[7,8]{Danila Bredikhin\ORCID{0000-0001-8089-6983}}
+\author[9]{Brian Schilder\ORCID{0000-0001-5949-2191}}
+\author[1,2]{Ruth Seurinck\ORCID{0000-0002-6636-7572}}
+\author[1,2]{Yvan Saeys\ORCID{0000-0002-0415-1506}}
+
+\authormark{}
+
+\address[1]{Data Mining and Modelling for Biomedicine, VIB Center for Inflammation Research}
+\address[2]{Department of Mathematics, Computer Science and Statistics, Ghent University, Belgium}
+\address[3]{Data Intuitive BV}
+\address[4]{Department of Biostatistics and Bioinformatics, Roswell Park Comprehensive Cancer Center}
+\address[5]{Institute of Computational Biology, Helmholtz, Center Munich, Munich, Germany}
+\address[6]{Chan Zuckerberg Initiative, Redwood City, CA, USA}
+
+\address[7]{Department of Genetics, Stanford University, Stanford, CA, USA}
+\address[8]{scverse}
+\address[9]{Department of Brain Sciences, Faculty of Medicine, Imperial College London, London, UK}
+
+
+\corresp[\textsuperscript{\textdagger}]{These authors contributed equally. }
+\corresp[$\ast$]{Corresponding author: \href{email:robrecht@data-intuitive.com}{robrecht@data-intuitive.com}}
+
+% \received{Date}{0}{Year}
+% \revised{Date}{0}{Year}
+% \accepted{Date}{0}{Year}
+
+%\editor{Associate Editor: Name}
+
+\abstract{
+\textbf{Summary:} Many single-cell transcriptomics datasets are stored in the HDF5-backed AnnData (H5AD) file format, as popularised by the Python scverse ecosystem. However, accessing these datasets from R, allowing users to take advantage of the strengths of each language, can be difficult. anndataR facilitates this access by allowing users to natively read and write H5AD files in R, convert them to and from SingleCellExperiment or Seurat objects, or even work with the resulting R AnnData object directly. We perform rigorous testing to ensure compatibility between Python-written and R-written H5AD files, guaranteeing long-term interoperability between languages.\\
+\textbf{Availability:} anndataR’s source code is available on GitHub at \href{https://github.com/scverse/anndataR/}{scverse/anndataR} under the MIT license. It is compatible with R version 4.5, has been archived at \href{https://doi.org/10.5281/zenodo.15689523}{10.5281/zenodo.15689523} and has been submitted to Bioconductor. Installation instructions and tutorials can be found in the \href{https://anndatar.data-intuitive.com/}{online documentation}. Issues can be reported at the GitHub repository. \\
+\textbf{Contact:} \href{mailto:robrecht@data-intuitive.com}{robrecht@data-intuitive.com}\\
+% \textbf{Supplementary information:} Supplementary data are available at \textit{Journal Name}
+% online.
+}
+
+\maketitle
+
+\section{Introduction}
+In the single-cell transcriptomics field, three main analysis eco\-systems exist: 
+scverse \citep{scverse}, Seurat \citep{Seurat} and Bioconductor \citep{Bioconductor}, 
+each defining its own in-memory data format. 
+Two of these, the SingleCellExperiment object used by Bioconductor and the Seurat object, are implemented in R, 
+while the scverse AnnData object \citep{anndata} is Python based.
+
+Each ecosystem has specific advantages for single-cell tran\-scriptomics (scRNA-seq) 
+data analysis and best practices and benchmarks recommend combining tools from different ecosystems to obtain an optimal processing pipeline for scRNA-seq data \citep{Heumos2023-qa}. 
+For instance, Seurat easily accommodates multi-modal assays, while Bioconductor comes with easy access to extensive statistical tooling and scverse leverages scalability and access to machine learning ecosystems.
+On top of that, small implementation differences in basic functionality (e.g. PCA) between the ecosystems may produce significantly different results \citep{rich2024impact}.
+As a result, users may need to switch between data formats or even programming languages to perform different analysis steps or to replicate existing analyses. 
+Unfortunately, this is not straightforward and a number of issues arise when trying to convert data between formats. 
+These issues stem from a) structural differences between the data formats and b) the different programming languages.
+
+\subsection{Differences in structure}\label{structure}
+
+All three data formats were developed to work with single-cell transcriptomics data but they take different approaches and structure their objects differently. An overview of the structure of these objects can be found in Table \ref{tab:structure}.
+
+For example, the AnnData object contains a \texttt{varm} slot which stores 
+multidimensional variable annotations (such as PCA loadings) but SingleCellExperiment 
+and Seurat instead store this in\-for\-ma\-tion as metadata of the cell reduction objects. 
+The Seurat object also has no corresponding slot for the AnnData \texttt{varp} slot, which is used for pairwise variable level annotations. 
+Seurat and SingleCellExperiment can also store multimodal data, which is not possible in AnnData. 
+Additionally, the frameworks differ in matrix orientation conventions. AnnData uses an observations by features layout, with observations (cells) in rows and features (genes) in columns. 
+Conversely, SingleCellExperiment and Seurat implement these matrices with cells as columns and genes as rows. 
+Because of these structural differences, in-depth knowledge of each object and the related storage conventions is required to correctly convert between formats, which presents a barrier to users moving between ecosystems.
+
+\begin{table}[]
+\small
+\begin{tabular}{>{\raggedright}p{\dimexpr 0.45\linewidth-2\tabcolsep}
+                 p{\dimexpr 0.2\linewidth-2\tabcolsep}
+                 p{\dimexpr 0.15\linewidth-2\tabcolsep}
+                 >{\raggedright\arraybackslash}p{\dimexpr 0.2\linewidth-2\tabcolsep}
+                }
+\thickhline
+\textbf{Stored information} & \textbf{AnnData} & \textbf{SCE} & \textbf{Seurat v5} \\ \thickhline
+Expression matrices & X, layers & assays & layers \\ \hline
+Unfiltered expression matrices (different features) & raw & altExp & layers \\ \hline
+Paired measurements (spike in, CITE-seq, \mydots) &  & altExp & assays \\ \hline
+Multi-omics data (different cells) &  &  & assays \\ \hline
+Cell-level metadata (cell type, \mydots) & obs & colData & cell level metadata \\ \hline
+Feature-level metadata (number of cells, \mydots) & var & rowData & assay level metadata \\ \hline
+Multidimensional cell-level metadata (dimensionality reductions) & obsm & reduced\-Dims & reductions \\ \hline
+Multidimensional feature-level metadata (loadings of dimensionality reductions) & varm & reduced\-Dims & reductions \\ \hline
+Cell by cell similarity matrices & obsp & colPairs & graphs \\ \hline
+Feature by feature similarity matrices & varp & rowPairs &  \\ \hline
+Other unstructured metadata & uns & metadata & misc \\ \thickhline
+\end{tabular}
+\caption{Overview of the three different data formats and the slots where specific information is stored.}
+\label{tab:structure}
+\end{table}
+
+\subsection{Different programming languages}\label{proglang}
+The different programming languages also complicate interoper\-abi\-lity. 
+Seurat and Bioconductor are written in R while scverse is written in Python. 
+As mentioned earlier, tools in both program\-ming languages are required to optimally analyse a single dataset.
+To address this, two other core data structures within the scverse ecosystem have some cross-language interoperability: MuData \citep{muon}, designed for multimodal data, provides R and Julia implementations, and SpatialData \citep{spatialdata} maintains active collaboration with R developers \citep{hackathon}.
+For single-cell transcriptomics analysis, there are many software packages that facilitate the conversion between different objects (Table \ref{tab:related}).
+They use a com\-bi\-na\-tion of approaches to transfer data between programming languages: they either use a so-called foreign function interface (FFI) to transfer information between languages during an interac\-tive session or they write and read the data to and from disk.
+
+FFIs like reticulate \citep{reticulate} or rpy2 \citep{rpy2} allow 
+a program written in one language to call or use functions written in another language. 
+This allows users to flexibly call foreign functions, transferring data from the native language 
+to the foreign language as needed. However, such an approach faces several limitations. It is 
+limited to built-in datatypes (such as vectors, lists or integers), requires managing both a Python and R environment, and naive use of 
+these interfaces can lead to excessive memory usage. 
+Software packages that use FFI to facilitate interaction with single-cell specific data formats include anndata2ri \citep{anndata2ri} and dynverse/anndata \citep{dynverseanndata}.
+
+\begin{table}[t]
+\small
+\begin{tabular}{>{\raggedright\arraybackslash}p{\dimexpr 0.25\linewidth-2\tabcolsep}
+                p{\dimexpr 0.18\linewidth-2\tabcolsep}
+                p{\dimexpr 0.10\linewidth-2\tabcolsep}
+                p{\dimexpr 0.16\linewidth-2\tabcolsep}
+                >{\raggedright\arraybackslash}p{\dimexpr 0.31\linewidth-2\tabcolsep}}
+\thickhline
+\textbf{Tool} & \textbf{Prog. lan\-guage} & \textbf{FFI} & \textbf{File format} & \textbf{Conversion} \\ \thickhline
+dynverse/ anndata \citep{dynverseanndata} & R & \checkmark &  &  \\ \hline
+anndata2ri \citep{anndata2ri} & Python & \checkmark &  & AnnData$\leftrightarrow$SCE \\ \hline
+Loom \citep{loompy, loomR} & R, Python &  & Loom (h5) &  \\ \hline
+scDIOR \citep{scdior} & R, Python &  & scDIOR (h5) & AnnData$\leftrightarrow$SCE \ AnnData$\leftrightarrow$Seurat \\ \hline
+BiocPy with rds2py \citep{rds2py} & Python &  &  &  \\ \hline
+alabaster dolomite \citep{alabaster, dolomite} & R, Python &  & HDF5, csv &  \\ \hline
+SeuratDisk \citep{seuratdisk} & R &  & h5Seurat & Seurat$\leftrightarrow$AnnData \\ \hline
+zellkonverter \citep{zellkonverter} & R & \checkmark &  & AnnData$\leftrightarrow$SCE \\ \hline
+sceasy \citep{sceasy} & R & \checkmark &  & Converts between AnnData, SCE, Seurat and Loom \\ \hline
+schard \citep{schard} & R &  &  & Converts between AnnData, SCE and Seurat\tablefootnote{Incomplete: only reads and converts X, obs, var, obsm} \\ \hline
+anndataR (this paper) & R &  &  & Converts between AnnData, SCE and Seurat \\ \hline
+SCUBA \citep{scuba} & R & \checkmark & provides API &  \\ \hline
+scKirby \citep{sckirby} & R & \checkmark &  & Converts between AnnData, SCE, Seurat and Loom\tablefootnote{Combines conversion functionality from other packages} \\ \thickhline
+\end{tabular}
+\caption{Overview of packages aiming to provide some form of inter\-oper\-ability between AnnData, SingleCellExperiment and Seurat objects}
+\label{tab:related}
+\end{table}
+
+The second approach, working on an object that gets inter\-mediately stored on disk, requires a 
+standard on-disk format accessible from both languages. A shared standard, loom, was introduced 
+but was not fully taken up by the community. The AnnData HDF5-based \citep{hdf5} H5AD format has 
+become the de facto standard for Python users and in some public repositories while R objects are
+commonly saved as non-interoperable binary Rds files. To address this, packages such as rds2py \citep{rds2py}, alabaster \citep{alabaster} and dolomite \citep{dolomite} provide ways to read and write SingleCellExperiment objects in Python. 
+SeuratDisk \citep{seuratdisk} provides a way to save Seurat objects as interoperable HDF5 files. 
+
+Other packages, including sceasy \citep{sceasy} and zellkonverter \citep{zellkonverter}, 
+combine these approaches to make H5AD files useable in R. They allow reading and writing of H5AD
+files to and from Seurat or SingleCellExperiment object but do so by using the reticulate software package, an FFI, to read the H5AD file using the Python anndata package before converting formats. 
+This approach only partially alleviates
+the burden of working with these FFIs. R users (or package maintainers) still
+need to maintain a Python environment and be mindful of in-memory duplication of data, even when
+all their analysis is performed in R. The data type conversions from Python to R can also be more
+cumbersome than those needed when reading in the HDF5 file from disk.
+
+\begin{figure*}[ht]
+    \centering
+    \includegraphics[width=0.75\textwidth, alt={Overview showing anndataR features and an example workflow, detailing how anndataR can be used during analysis.}]{anndataR_figure.pdf}
+    \caption{Feature overview and showcase of how to use anndataR in an analysis workflow.}
+    \label{fig:analysis}
+\end{figure*}
+
+\section{Results}
+
+To overcome these limitations we introduce anndataR, a new package which allows native reading 
+and writing of H5AD files in R, without requiring a Python environment, provides an R AnnData 
+object and facilitates conversion to and from other data formats. anndataR was conceived and 
+developed as a collaborative effort between members of both the scverse and Bioconductor 
+communities, who together identified the gaps in the current interoperability climate.
+
+anndataR is unique in its ability to read and write H5AD files natively in R and convert them 
+to SingleCellExperiment or Seurat objects. By avoiding FFIs, anndataR 
+avoids many of the associated challenges. The conversion functionality it offers bridges the 
+gap between the ecosystems, with sensible defaults (see Supplementary Figure 2 and 3) and fine-grained control for advanced use. 
+anndataR allows users direct access to an R AnnData representation, making it possible to 
+interact with the object directly, in order to solve conversion issues and to facilitate easy 
+extraction of relevant parts of the data.
+
+\section{Software Design}
+
+Users primarily interact with anndataR by reading in an existing H5AD file and specifying 
+whether to return an AnnData object in R (either in memory or HDF5-backed), or immediately 
+perform a conversion to a SingleCellExperiment or Seurat object, as shown in Supplementary Figure 1. % \ref{supp-fig:classdiagram}. 
+The resulting R object can then be used as normal and can be saved to a new H5AD file on 
+completion of the analysis.
+An example of how anndataR can be used in an analysis workflow is shown in Figure \ref{fig:analysis}.
+
+To enable this workflow, we use rhdf5 \citep{rhdf5}, an R interface to the HDF5 
+library which handles the low-level interactions with HDF5 files to natively read and write
+the H5AD format according to the AnnData on-disk specification. To take advantage of existing
+R analysis packages users also need to be able to convert between AnnData objects and 
+SingleCellExperiment or Seurat objects. By default the anndataR conversion functions 
+try to convert as much data as possible, but also allow the experienced user to completely
+specify the details of the conversion by providing a mapping for each slot in the resulting
+object. Full details of the conversion can be found in the package documentation.
+
+We are aware that small changes in any of these data formats can quickly lead to failures
+in reading, writing or converting. To ensure the package functionality is robust against 
+data format changes, we perform extensive testing. H5AD files written with anndataR are 
+validated against the ones produced by the Python anndata package. This is necessary 
+because there are differences in how Python and R handle data, such as row-major 
+versus column-major matrices, and in how the Python and R HDF5 libraries translate 
+data to H5 datatypes. We perform these checks using a number of round-trip tests for 
+each AnnData slot, checking whether an R-written H5AD slot can be read in Python and vice 
+versa. We also check for differences in the generated H5AD files using the \texttt{h5diff} utility. 
+Additionally, we verify the conversions to and from SingleCellExperiment and Seurat by 
+slot-by-slot verification of the objects. This approach to exhaustively testing 
+functionality has been key for the development of anndataR, allowing us to document known 
+limitations and incompatibilities. This has led to a comprehensive and robust tool, 
+(Supplementary Table 1) with comparable runtime performance to similar tools
+(Supplementary Figure 4).
+
+Finally, in order to represent the complex AnnData structure and replicate the Python 
+interface, make use of inheritance, keep memory usage low and use reference semantics, we 
+chose to use the R6 object oriented class system.
+
+\section{Conclusion}
+anndataR meaningfully adds to the interoperability landscape between R and Python for 
+single-cell transcriptomics by allowing users to work natively with H5AD files in R and 
+providing conversion functionality to and from SingleCellExperiment and Seurat objects. 
+This conversion functionality not only provides reasonable defaults but also allows 
+fine-grained user control. Additionally, the package functionality, such as compatibility 
+between R-written and Python-written H5AD files, is rigorously tested.
+
+Finally, the modular design of the software makes it easy to extend the functionality of the package, enabling future support for additional file formats (e.g., Zarr) and other modalities, such as scATAC-seq or CITE-seq (via MuData \citep{muon}) and spatial data (via the SpatialData \citep{spatialdata} framework). 
+
+\section{Acknowledgments}
+
+This work was supported by the Research Foundation - Flanders (FWO) [1SF3822N to L.D.]; 
+Chan Zuckerberg Initiative Essential Open Source Software for Science grant [EOSS6-0000000743 to L.Z. and R.C.];
+Chan Zuckerberg Initiative Foundation (CZIF) - CZI Seed Networks [CZIF2019-002443 to M.M.];
+Ghent University Special Research Fund [BOF21-DOC-105 to C.S.]
+and the Flanders AI Research (FAIR) Program [174B09119 to R.S. and Y.S.]; 
+
+We acknowledge the contribution of the scverse core. Members: Can Ergen\textsuperscript{1,2}, Danila Bredikhin\textsuperscript{3}, Emma Dann\textsuperscript{3}, Giovanni Palla\textsuperscript{4}, Gregor Sturm\textsuperscript{5}, Ilan Gold\textsuperscript{6}, Isaac Virshup\textsuperscript{4,6}, Jennifer A. Foltz\textsuperscript{7}, Luca Marconato\textsuperscript{8,9}, Lukas Heumos\textsuperscript{10}, Mikaela Koutrouli\textsuperscript{11}, Pau Badia-i-Mompel\textsuperscript{3}, Philipp Angerer\textsuperscript{12}, Roshan Sharma\textsuperscript{13,14}, Sara Jimenez\textsuperscript{14}, Severin Dicks\textsuperscript{10,15}, Tim Treis\textsuperscript{12}, Wouter-Michiel Vierdag\textsuperscript{16,17}.
+
+\textsuperscript{1}Department of Electrical Engineering and Computer Sciences, University of California Berkeley, Berkeley, CA, US
+\textsuperscript{2}Department of Medicine, University Medical Center Hamburg‐Eppendorf, Hamburg, Germany.
+\textsuperscript{3}Department of Genetics, Stanford University, Stanford, CA, USA
+\textsuperscript{4}Chan Zuckerberg Initiative, Redwood City, California, USA
+\textsuperscript{5}Boehringer Ingelheim International Pharma GmbH \& Co KG , 88397 Biberach/Riss, Germany
+\textsuperscript{6}Institute of Computational Biology, Helmholtz, Center Munich, Munich, Germany
+\textsuperscript{7}Washington University School of Medicine, St. Louis, Missouri, US
+\textsuperscript{8}European Molecular Biology Laboratory, Genome Biology Unit, Heidelberg, Germany
+\textsuperscript{9}Division of Computational Genomics and System Genetics, German Cancer Research Center, Heidelberg, Germany
+\textsuperscript{10}Helmholtz Zentrum München: Munich, Bavaria, DE
+\textsuperscript{11}Computational Sciences-Center of Excellence, Genentech, South San Francisco, CA, United States
+\textsuperscript{12}Helmholtz Zentrum München Deutsches Forschungszentrum für Gesundheit und Umwelt: Neuherberg, Bayern, DE
+\textsuperscript{13}Computational and Systems Biology Program, Sloan Kettering Institute, Memorial Sloan Kettering Cancer Center, New York, NY
+\textsuperscript{14}Single-cell Analytics Innovation Lab, Memorial Sloan Kettering Cancer Center, New York, NY
+\textsuperscript{15}Nvidia, Santa Clara, CA, USA
+\textsuperscript{16}European Molecular Biology Laboratory, Genome Biology Unit, Heidelberg, Germany
+\textsuperscript{17}Collaboration for joint PhD degree between EMBL and Heidelberg University, Faculty of Biosciences, Heidelberg, Germany
+
+\bibliographystyle{abbrvnat}
+\bibliography{reference}
+
+\end{document}

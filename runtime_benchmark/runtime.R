@@ -100,6 +100,7 @@ p1
 
 ggsave("runtime_benchmark/elapsed_time.png", p1, width = 7, height = 5)
 ggsave("runtime_benchmark/elapsed_time.svg", p1, width = 7, height = 5)
+ggsave("runtime_benchmark/elapsed_time.pdf", p1, width = 7, height = 5)
 
 p2 <- ggplot(
     data = timings, 
@@ -117,4 +118,4 @@ theme_bw()
 p2
 
 ggsave("runtime_benchmark/user_time.png", p2, width = 7, height = 5)
-ggsave("runtime_benchmark/user_time.svg", p2, width = 7, height = 5)
+ggsave("runtime_benchmark/user_time.pdf", p2, width = 7, height = 5)
