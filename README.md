@@ -1,4 +1,5 @@
 # anndataR: comparison with similar packages
+The revised version of the paper can be found under `revised_paper`.
 
 ## Functionality testing
 Examines which datatypes are supported by which packages in which slots.
