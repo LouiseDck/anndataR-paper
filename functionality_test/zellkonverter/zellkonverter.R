@@ -37,7 +37,9 @@ rowData(zk_sce)
 # ZELLKONVERTER | var | OK
 
 # obsm
-# issues: not solveable
+zk_obsm1 <- zellkonverter::readH5AD("functionality_test/dummy_data/dummy_obsm1.h5ad", reader = "R")
+zk_obsm2 <- zellkonverter::readH5AD("functionality_test/dummy_data/dummy_obsm2.h5ad", reader = "R")
+# issues: not solveable, not even with just a dense or sparse float matrix in obsm
 #   setting 'reducedDims' failed for 'dummy_data/dummy_complete_no_3d.h5ad':
 #   invalid 'value' in 'reducedDims(<SingleCellExperiment>) <- value' each
 #   element of 'value' should have number of rows equal to 'ncol(x)'

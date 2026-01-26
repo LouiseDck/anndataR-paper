@@ -1,3 +1,5 @@
+.venv/
+
 *.h5ad
 
 # tex files

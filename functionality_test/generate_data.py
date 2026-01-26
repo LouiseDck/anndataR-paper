@@ -41,6 +41,27 @@ del dummy.obsm["integer_matrix_3d"]
 dummy.write_h5ad(f"functionality_test/dummy_data/dummy_complete_no_3d.h5ad")
 
 # for ZELLKONVERTER:
+# check for basic obs: dense and sparse
+dummy_obsm1 = da.generate_dataset(
+    n_obs=n_obs,
+    n_vars=n_var,
+    x_type = "integer_matrix",
+    obsm_types = ["float_matrix"]
+)
+del dummy.varm
+
+dummy.write_h5ad(f"functionality_test/dummy_data/dummy_obsm1.h5ad")
+
+dummy_obsm2 = da.generate_dataset(
+    n_obs=n_obs,
+    n_vars=n_var,
+    x_type = "integer_matrix",
+    obsm_types = ["float_csparse"]
+)
+del dummy.varm
+
+dummy.write_h5ad(f"functionality_test/dummy_data/dummy_obsm2.h5ad")
+
 # no 3d matrices in varm
 dummy = da.generate_dataset(
     n_obs=n_obs,
