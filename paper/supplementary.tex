@@ -47,7 +47,7 @@
 \begin{figure*}[h!]
     \centering
     \includegraphics[width=1\textwidth]{user_time.pdf}
-    \caption{Results of a benchmark performed to compare runtime of reading an H5AD file using anndataR and similar packages, schard and zellkonverter.}
+    \caption{Results of a benchmark performed to compare runtime of reading an H5AD file using anndataR and similar packages, schard and zellkonverter. The benchmark was performed using datasets containing 20 000 genes, and 100, 1000, 10 000, 100 000, 250 000 and 500 000 cells, with a density of 5\%.}
 \end{figure*}
 
 \newpage
@@ -76,6 +76,7 @@ slot and 3) writing the data type back to an H5AD file.\\
 \texttt{-}: the specific data type is not supported in a SingleCellExperiment or Seurat object.
 }\\
                 &                           & \multicolumn{4}{l}{\textbf{anndataR}}                                                                         &  & \multicolumn{4}{l}{\textbf{schard}}                                                                           &  & \multicolumn{4}{l}{\textbf{zellkonverter}}                                           \\
+                &                           & \multicolumn{4}{l}{\textbf{(this paper)}}                                                                         &  & \multicolumn{4}{l}{\textbf{}}                                                                           &  & \multicolumn{4}{l}{\textbf{(native R reader)}}                                           \\
 \textbf{slot}   & \textbf{datatype}         & \rot{\textbf{in R}}       & \rot{\textbf{to SCE}}     & \rot{\textbf{to Seurat}}  & \rot{\textbf{to H5AD}}    &  & \rot{\textbf{in R}}       & \rot{\textbf{to SCE}}     & \rot{\textbf{to Seurat}}  & \rot{\textbf{to H5AD}}    &  & \rot{\textbf{in R}}       & \rot{\textbf{to SCE}}     & \rot{\textbf{to Seurat}}  & \rot{\textbf{to H5AD}}    \\
 \textbf{X}      & integer\_matrix           & \cellcolor[HTML]{B7E1CD}x & \cellcolor[HTML]{B7E1CD}x & \cellcolor[HTML]{B7E1CD}x & \cellcolor[HTML]{B7E1CD}x &  & \cellcolor[HTML]{F4CCCC}/ & \cellcolor[HTML]{B7E1CD}x & \cellcolor[HTML]{B7E1CD}x & \cellcolor[HTML]{F4CCCC}/ &  & \cellcolor[HTML]{F4CCCC}/ & \cellcolor[HTML]{B7E1CD}x & \cellcolor[HTML]{F4CCCC}/ & \cellcolor[HTML]{F4CCCC}/ \\
                 & integer\_csparse          & \cellcolor[HTML]{B7E1CD}x & \cellcolor[HTML]{B7E1CD}x & \cellcolor[HTML]{B7E1CD}x & \cellcolor[HTML]{B7E1CD}x &  & \cellcolor[HTML]{F4CCCC}/ & \cellcolor[HTML]{B7E1CD}x & \cellcolor[HTML]{B7E1CD}x & \cellcolor[HTML]{F4CCCC}/ &  & \cellcolor[HTML]{F4CCCC}/ & \cellcolor[HTML]{B7E1CD}x & \cellcolor[HTML]{F4CCCC}/ & \cellcolor[HTML]{F4CCCC}/ \\
