@@ -1,0 +1,172 @@
+[workspace]
+name = "anndataR-paper-benchmark"
+version = "0.1.0"
+description = "Runtime benchmarks for the anndataR paper"
+channels = ["conda-forge", "bioconda"]
+platforms = ["linux-64"]
+
+[dependencies]
+# Python
+python = ">=3.12"
+anndata = ">=0.11"
+scipy = ">=1.14"
+
+# R base + CRAN packages
+r-base = ">=4.5"
+r-bench = "*"
+r-ggplot2 = "*"
+r-scales = "*"
+r-reticulate = "*"
+r-matrix = "*"
+r-remotes = "*"
+r-biocmanager = "*"
+r-svglite = "*"
+
+# Bioconductor packages (from bioconda)
+bioconductor-anndatar = ">=1.0"
+
+# System libraries needed to compile Bioconductor packages from source
+zlib = "*"
+
+[pypi-dependencies]
+dummy-anndata = ">=0.0.3"
+
+# ---------------------------------------------------------------------------
+# Tasks – pixi orchestrates the full benchmark pipeline via `pixi run all`
+# ---------------------------------------------------------------------------
+
+[tasks.install-r-extras]
+cmd = """
+  unset GITHUB_PAT && unset GITHUB_TOKEN && Rscript -e '
+    # zellkonverter has no R 4.5 build on bioconda yet, install from source
+    pkgs <- c("zellkonverter", "SummarizedExperiment", "HDF5Array")
+    missing <- pkgs[!sapply(pkgs, requireNamespace, quietly = TRUE)]
+    if (length(missing) > 0) {
+      message("Installing from Bioconductor: ", paste(missing, collapse = ", "))
+      BiocManager::install(missing, ask = FALSE, update = FALSE)
+    } else {
+      message("All Bioconductor packages already installed")
+    }
+
+    if (!requireNamespace("schard", quietly = TRUE)) {
+      message("Installing schard from GitHub ...")
+      remotes::install_github("cellgeni/schard", upgrade = "never")
+    } else {
+      message("schard already installed")
+    }
+  '
+"""
+outputs = [
+  ".pixi/envs/default/lib/R/library/zellkonverter/DESCRIPTION",
+  ".pixi/envs/default/lib/R/library/schard/DESCRIPTION"
+]
+description = "Install R packages not yet on bioconda for R 4.5 (zellkonverter, schard)"
+
+[tasks.generate-data]
+cmd = "python runtime_benchmark/scripts/1_generate_datasets.py"
+inputs = ["runtime_benchmark/scripts/1_generate_datasets.py"]
+outputs = [
+  "runtime_benchmark/datasets/d100.h5ad",
+  "runtime_benchmark/datasets/d200.h5ad",
+  "runtime_benchmark/datasets/d500.h5ad",
+  "runtime_benchmark/datasets/d1000.h5ad",
+  "runtime_benchmark/datasets/d2000.h5ad",
+  "runtime_benchmark/datasets/d5000.h5ad",
+  "runtime_benchmark/datasets/d10000.h5ad",
+  "runtime_benchmark/datasets/d20000.h5ad",
+  "runtime_benchmark/datasets/d50000.h5ad",
+  "runtime_benchmark/datasets/d100000.h5ad",
+  "runtime_benchmark/datasets/d200000.h5ad",
+  "runtime_benchmark/datasets/d500000.h5ad"
+]
+description = "Generate synthetic H5AD benchmark datasets"
+
+# --- Individual benchmarks (each in its own Rscript process) ----------------
+
+[tasks.bench-anndataR-inmemory]
+cmd = "Rscript runtime_benchmark/scripts/2_bench_anndataR_inmemory.R"
+depends-on = ["install-r-extras", "generate-data"]
+inputs = [
+  "runtime_benchmark/scripts/2_bench_anndataR_inmemory.R",
+  "runtime_benchmark/datasets/*.h5ad"
+]
+outputs = ["runtime_benchmark/timings/anndataR_inmemory.csv"]
+description = "Benchmark anndataR InMemoryAnnData reader"
+
+[tasks.bench-anndataR-hdf5]
+cmd = "Rscript runtime_benchmark/scripts/2_bench_anndataR_hdf5.R"
+depends-on = ["install-r-extras", "generate-data"]
+inputs = [
+  "runtime_benchmark/scripts/2_bench_anndataR_hdf5.R",
+  "runtime_benchmark/datasets/*.h5ad"
+]
+outputs = ["runtime_benchmark/timings/anndataR_hdf5.csv"]
+description = "Benchmark anndataR HDF5AnnData reader"
+
+[tasks.bench-anndataR-reticulate]
+cmd = "Rscript runtime_benchmark/scripts/2_bench_anndataR_reticulate.R"
+depends-on = ["install-r-extras", "generate-data"]
+inputs = [
+  "runtime_benchmark/scripts/2_bench_anndataR_reticulate.R",
+  "runtime_benchmark/datasets/*.h5ad"
+]
+outputs = ["runtime_benchmark/timings/anndataR_reticulate.csv"]
+description = "Benchmark anndataR ReticulateAnnData (via reticulate/anndata)"
+
+[tasks.bench-zellkonverter-R]
+cmd = "Rscript runtime_benchmark/scripts/2_bench_zellkonverter_R.R"
+depends-on = ["install-r-extras", "generate-data"]
+inputs = [
+  "runtime_benchmark/scripts/2_bench_zellkonverter_R.R",
+  "runtime_benchmark/datasets/*.h5ad"
+]
+outputs = ["runtime_benchmark/timings/zellkonverter_R.csv"]
+description = "Benchmark zellkonverter R reader"
+
+[tasks.bench-zellkonverter-python]
+cmd = "Rscript runtime_benchmark/scripts/2_bench_zellkonverter_python.R"
+depends-on = ["install-r-extras", "generate-data"]
+inputs = [
+  "runtime_benchmark/scripts/2_bench_zellkonverter_python.R",
+  "runtime_benchmark/datasets/*.h5ad"
+]
+outputs = ["runtime_benchmark/timings/zellkonverter_python.csv"]
+description = "Benchmark zellkonverter Python/basilisk reader"
+
+[tasks.bench-schard]
+cmd = "Rscript runtime_benchmark/scripts/2_bench_schard.R"
+depends-on = ["install-r-extras", "generate-data"]
+inputs = [
+  "runtime_benchmark/scripts/2_bench_schard.R",
+  "runtime_benchmark/datasets/*.h5ad"
+]
+outputs = ["runtime_benchmark/timings/schard.csv"]
+description = "Benchmark schard reader"
+
+# --- Aggregate benchmark task -----------------------------------------------
+
+[tasks.bench]
+depends-on = [
+  "bench-anndataR-inmemory",
+  "bench-anndataR-hdf5",
+  "bench-anndataR-reticulate",
+  "bench-zellkonverter-R",
+  "bench-zellkonverter-python",
+  "bench-schard",
+]
+description = "Run all benchmarks"
+
+# --- Plot -------------------------------------------------------------------
+
+[tasks.plot]
+cmd = "Rscript runtime_benchmark/scripts/3_plot.R"
+depends-on = ["bench"]
+inputs = ["runtime_benchmark/scripts/3_plot.R", "runtime_benchmark/timings/*.csv"]
+outputs = ["runtime_benchmark/plots/elapsed_time.pdf", "runtime_benchmark/plots/elapsed_time.png", "runtime_benchmark/plots/elapsed_time.svg"]
+description = "Combine timings and generate plots"
+
+# --- Top-level task ---------------------------------------------------------
+
+[tasks.all]
+depends-on = ["plot"]
+description = "Run full pipeline: generate data → benchmark → plot"

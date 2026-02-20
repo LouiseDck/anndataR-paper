@@ -10,10 +10,10 @@ import dummy_anndata as da
 import scipy as sp
 
 
-OUT_DIR = "runtime_benchmark/data"
+OUT_DIR = "runtime_benchmark/datasets"
 os.makedirs(OUT_DIR, exist_ok=True)
 
-SIZES = [100, 1_000, 10_000, 100_000, 250_000, 500_000]
+SIZES = [100, 200, 500, 1_000, 2_000, 5_000, 10_000, 20_000, 50_000, 100_000, 250_000, 500_000]
 N_VARS = 20_000
 DENSITY = 0.05
 

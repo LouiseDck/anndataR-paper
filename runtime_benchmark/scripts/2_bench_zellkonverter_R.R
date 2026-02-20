@@ -2,21 +2,23 @@ library(bench)
 library(zellkonverter)
 library(SummarizedExperiment)
 
-data_dir  <- "runtime_benchmark/data"
-out_dir   <- "runtime_benchmark"
-n_cells   <- c(100, 1000, 10000, 100000, 250000, 500000)
+data_dir  <- "runtime_benchmark/datasets"
+out_dir   <- "runtime_benchmark/timings"
+dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
+
+n_cells   <- c(100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000, 500000)
 filenames <- file.path(data_dir, paste0("d", sprintf("%d", n_cells), ".h5ad"))
 min_iter  <- 3
 
 # Force full materialisation: sum all non-zero values of the X sparse matrix.
 read_and_force <- function(fn) {
-  sce <- zellkonverter::readH5AD(fn)   # default: Python/basilisk reader
+  sce <- zellkonverter::readH5AD(fn, reader = "R")
   sum(assay(sce, "X")@x)
   invisible(sce)
 }
 
-# Warm up (also initialises the basilisk Python environment)
-message("Warming up zellkonverter (Python) ...")
+# Warm up
+message("Warming up zellkonverter (R) ...")
 invisible(read_and_force(filenames[[1]]))
 
 results <- mapply(function(fn, n) {
@@ -28,7 +30,7 @@ results <- mapply(function(fn, n) {
                     filter_gc      = FALSE)
   times <- as.numeric(bm$time[[1]])
   data.frame(
-    package   = "zellkonverter (Python)",
+    package   = "zellkonverter (R)",
     n_cells   = n,
     median    = median(times),
     q1        = quantile(times, 0.25),
@@ -42,5 +44,5 @@ results <- mapply(function(fn, n) {
 }, filenames, n_cells, SIMPLIFY = FALSE)
 
 timings <- do.call(rbind, results)
-write.csv(timings, file.path(out_dir, "timings_zellkonverter_python.csv"), row.names = FALSE)
-message("Saved timings_zellkonverter_python.csv")
+write.csv(timings, file.path(out_dir, "zellkonverter_R.csv"), row.names = FALSE)
+message("Saved ", file.path(out_dir, "zellkonverter_R.csv"))
