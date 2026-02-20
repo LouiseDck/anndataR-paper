@@ -13,7 +13,8 @@ import scipy as sp
 OUT_DIR = "runtime_benchmark/datasets"
 os.makedirs(OUT_DIR, exist_ok=True)
 
-SIZES = [100, 200, 500, 1_000, 2_000, 5_000, 10_000, 20_000, 50_000, 100_000, 200_000, 500_000, 1_000_000]
+# TODO: reenable larger sizes
+SIZES = [100, 200, 500, 1_000, 2_000, 5_000, 10_000, 20_000, 50_000, 100_000] #, 200_000, 500_000, 1_000_000]
 N_VARS = 20_000
 DENSITY = 0.05
 
@@ -63,8 +64,9 @@ def generate_and_save(n_obs, n_vars=N_VARS):
     print(f"Generating d{n_obs}.h5ad ...")
     dataset = da.generate_dataset(**_obs_var_kwargs(n_obs, n_vars))
     dataset.X = generate_sparse_x(n_obs, n_vars)
+    dataset.uns["x_sum"] = float(dataset.X.data.sum())
     dataset.write_h5ad(path)
-    print(f"  Saved {path}")
+    print(f"  Saved {path} (x_sum={dataset.uns['x_sum']:.0f})")
 
 
 if __name__ == "__main__":

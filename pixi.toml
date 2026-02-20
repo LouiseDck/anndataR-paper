@@ -15,6 +15,8 @@ scipy = ">=1.14"
 r-base = ">=4.5"
 r-bench = "*"
 r-ggplot2 = "*"
+r-ggrepel = "*"
+r-optparse = "*"
 r-scales = "*"
 r-reticulate = "*"
 r-matrix = "*"
@@ -67,63 +69,87 @@ outputs = [
   "runtime_benchmark/datasets/d500.h5ad",
   "runtime_benchmark/datasets/d1000.h5ad",
   "runtime_benchmark/datasets/d2000.h5ad",
-  "runtime_benchmark/datasets/d5000.h5ad",
-  "runtime_benchmark/datasets/d10000.h5ad",
-  "runtime_benchmark/datasets/d20000.h5ad",
-  "runtime_benchmark/datasets/d50000.h5ad",
-  "runtime_benchmark/datasets/d100000.h5ad",
-  "runtime_benchmark/datasets/d200000.h5ad",
-  "runtime_benchmark/datasets/d500000.h5ad"
+  "runtime_benchmark/datasets/d5000.h5ad"
 ]
 description = "Generate synthetic H5AD benchmark datasets"
 
 # --- Individual benchmarks (each in its own Rscript process) ----------------
 
 [tasks.bench-anndataR-inmemory]
-cmd = "Rscript runtime_benchmark/scripts/2_bench_anndataR_inmemory.R"
+cmd = "Rscript runtime_benchmark/scripts/2_bench_anndataR.R --backend inmemory"
 depends-on = ["install-r-extras", "generate-data"]
 inputs = [
-  "runtime_benchmark/scripts/2_bench_anndataR_inmemory.R",
+  "runtime_benchmark/scripts/2_bench_anndataR.R",
   "runtime_benchmark/datasets/*.h5ad"
 ]
 outputs = ["runtime_benchmark/timings/anndataR_inmemory.csv"]
 description = "Benchmark anndataR InMemoryAnnData reader"
 
-[tasks.bench-anndataR-hdf5]
-cmd = "Rscript runtime_benchmark/scripts/2_bench_anndataR_hdf5.R"
+[tasks.bench-anndataR-inmemory-sce]
+cmd = "Rscript runtime_benchmark/scripts/2_bench_anndataR.R --backend inmemory --sce"
 depends-on = ["install-r-extras", "generate-data"]
 inputs = [
-  "runtime_benchmark/scripts/2_bench_anndataR_hdf5.R",
+  "runtime_benchmark/scripts/2_bench_anndataR.R",
+  "runtime_benchmark/datasets/*.h5ad"
+]
+outputs = ["runtime_benchmark/timings/anndataR_inmemory2sce.csv"]
+description = "Benchmark anndataR InMemoryAnnData → SCE conversion"
+
+[tasks.bench-anndataR-hdf5]
+cmd = "Rscript runtime_benchmark/scripts/2_bench_anndataR.R --backend hdf5"
+depends-on = ["install-r-extras", "generate-data"]
+inputs = [
+  "runtime_benchmark/scripts/2_bench_anndataR.R",
   "runtime_benchmark/datasets/*.h5ad"
 ]
 outputs = ["runtime_benchmark/timings/anndataR_hdf5.csv"]
 description = "Benchmark anndataR HDF5AnnData reader"
 
-[tasks.bench-anndataR-reticulate]
-cmd = "Rscript runtime_benchmark/scripts/2_bench_anndataR_reticulate.R"
+[tasks.bench-anndataR-hdf5-sce]
+cmd = "Rscript runtime_benchmark/scripts/2_bench_anndataR.R --backend hdf5 --sce"
 depends-on = ["install-r-extras", "generate-data"]
 inputs = [
-  "runtime_benchmark/scripts/2_bench_anndataR_reticulate.R",
+  "runtime_benchmark/scripts/2_bench_anndataR.R",
+  "runtime_benchmark/datasets/*.h5ad"
+]
+outputs = ["runtime_benchmark/timings/anndataR_hdf52sce.csv"]
+description = "Benchmark anndataR HDF5AnnData → SCE conversion"
+
+[tasks.bench-anndataR-reticulate]
+cmd = "Rscript runtime_benchmark/scripts/2_bench_anndataR.R --backend reticulate"
+depends-on = ["install-r-extras", "generate-data"]
+inputs = [
+  "runtime_benchmark/scripts/2_bench_anndataR.R",
   "runtime_benchmark/datasets/*.h5ad"
 ]
 outputs = ["runtime_benchmark/timings/anndataR_reticulate.csv"]
 description = "Benchmark anndataR ReticulateAnnData (via reticulate/anndata)"
 
-[tasks.bench-zellkonverter-R]
-cmd = "Rscript runtime_benchmark/scripts/2_bench_zellkonverter_R.R"
+[tasks.bench-anndataR-reticulate-sce]
+cmd = "Rscript runtime_benchmark/scripts/2_bench_anndataR.R --backend reticulate --sce"
 depends-on = ["install-r-extras", "generate-data"]
 inputs = [
-  "runtime_benchmark/scripts/2_bench_zellkonverter_R.R",
+  "runtime_benchmark/scripts/2_bench_anndataR.R",
+  "runtime_benchmark/datasets/*.h5ad"
+]
+outputs = ["runtime_benchmark/timings/anndataR_reticulate2sce.csv"]
+description = "Benchmark anndataR ReticulateAnnData → SCE conversion"
+
+[tasks.bench-zellkonverter-R]
+cmd = "Rscript runtime_benchmark/scripts/2_bench_zellkonverter.R --backend R"
+depends-on = ["install-r-extras", "generate-data"]
+inputs = [
+  "runtime_benchmark/scripts/2_bench_zellkonverter.R",
   "runtime_benchmark/datasets/*.h5ad"
 ]
 outputs = ["runtime_benchmark/timings/zellkonverter_R.csv"]
 description = "Benchmark zellkonverter R reader"
 
 [tasks.bench-zellkonverter-python]
-cmd = "Rscript runtime_benchmark/scripts/2_bench_zellkonverter_python.R"
+cmd = "Rscript runtime_benchmark/scripts/2_bench_zellkonverter.R --backend python"
 depends-on = ["install-r-extras", "generate-data"]
 inputs = [
-  "runtime_benchmark/scripts/2_bench_zellkonverter_python.R",
+  "runtime_benchmark/scripts/2_bench_zellkonverter.R",
   "runtime_benchmark/datasets/*.h5ad"
 ]
 outputs = ["runtime_benchmark/timings/zellkonverter_python.csv"]
@@ -139,16 +165,43 @@ inputs = [
 outputs = ["runtime_benchmark/timings/schard.csv"]
 description = "Benchmark schard reader"
 
+# --- Python anndata control benchmark (memory + backed) ---------------------
+
+[tasks.bench-anndata-memory]
+cmd = "python runtime_benchmark/scripts/2_bench_anndata.py"
+depends-on = ["generate-data"]
+inputs = [
+  "runtime_benchmark/scripts/2_bench_anndata.py",
+  "runtime_benchmark/datasets/*.h5ad"
+]
+outputs = ["runtime_benchmark/timings/anndata_memory.csv"]
+description = "Benchmark Python anndata in-memory reader (control)"
+
+[tasks.bench-anndata-backed]
+cmd = "python runtime_benchmark/scripts/2_bench_anndata.py --backed"
+depends-on = ["generate-data"]
+inputs = [
+  "runtime_benchmark/scripts/2_bench_anndata.py",
+  "runtime_benchmark/datasets/*.h5ad"
+]
+outputs = ["runtime_benchmark/timings/anndata_backed.csv"]
+description = "Benchmark Python anndata backed/lazy HDF5 reader (control)"
+
 # --- Aggregate benchmark task -----------------------------------------------
 
 [tasks.bench]
 depends-on = [
   "bench-anndataR-inmemory",
+  "bench-anndataR-inmemory-sce",
   "bench-anndataR-hdf5",
+  "bench-anndataR-hdf5-sce",
   "bench-anndataR-reticulate",
+  "bench-anndataR-reticulate-sce",
   "bench-zellkonverter-R",
   "bench-zellkonverter-python",
   "bench-schard",
+  "bench-anndata-memory",
+  "bench-anndata-backed",
 ]
 description = "Run all benchmarks"
 
