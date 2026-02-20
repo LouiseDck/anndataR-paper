@@ -56,10 +56,6 @@ cmd = """
     }
   '
 """
-outputs = [
-  ".pixi/envs/default/lib/R/library/zellkonverter/DESCRIPTION",
-  ".pixi/envs/default/lib/R/library/schard/DESCRIPTION"
-]
 description = "Install R packages not yet on bioconda for R 4.5 (zellkonverter, schard)"
 
 [tasks.generate-data]

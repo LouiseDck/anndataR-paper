@@ -5,7 +5,7 @@ data_dir  <- "runtime_benchmark/datasets"
 out_dir   <- "runtime_benchmark/timings"
 dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
 
-n_cells   <- c(100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000, 500000)
+n_cells   <- c(100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000, 500000, 1000000)
 filenames <- file.path(data_dir, paste0("d", sprintf("%d", n_cells), ".h5ad"))
 min_iter  <- 3
 
