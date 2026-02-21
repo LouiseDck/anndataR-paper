@@ -48,6 +48,10 @@ pkg_colours <- c(
 # --- Plot --------------------------------------------------------------------
 
 plot_data  <- timings[!is.na(timings$median), ]
+
+# subset results, remove 'anndata .*', 'anndataR (.* to SCE)'.
+plot_data <- plot_data[!grepl("anndata \\(.*\\)|anndataR \\(.* to SCE\\)", plot_data$package), ]
+
 last_points <- do.call(rbind, lapply(
   split(plot_data, plot_data$package),
   function(d) d[which.max(d$n_cells), ]
@@ -77,8 +81,8 @@ p <- ggplot(
     expand = expansion(mult = c(0.03, 0.3))
   ) +
   scale_y_log10(labels = label_number(suffix = " s")) +
-  scale_color_manual(values = pkg_colours) +
-  # scale_color_brewer(palette = "Dark2") +
+  # scale_color_manual(values = pkg_colours) +
+  scale_color_brewer(palette = "Dark2") +
   labs(
     x     = "Number of cells",
     y     = "Elapsed time (median)",
