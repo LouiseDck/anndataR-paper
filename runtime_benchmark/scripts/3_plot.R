@@ -8,9 +8,12 @@ timings_dir <- "runtime_benchmark/timings"
 plots_dir   <- "runtime_benchmark/plots"
 dir.create(plots_dir, showWarnings = FALSE, recursive = TRUE)
 
+final <- TRUE
+
 # --- Combine CSVs ------------------------------------------------------------
 
 csv_files <- list.files(timings_dir, pattern = "\\.csv$", full.names = TRUE)
+
 # exclude the combined file itself if it already exists
 csv_files <- csv_files[basename(csv_files) != "timings.csv"]
 
@@ -26,7 +29,6 @@ timings <- do.call(rbind, lapply(csv_files, function(f) {
 }))
 write.csv(timings, combined_path, row.names = FALSE)
 message("Saved combined timings to: ", combined_path)
-# timings <- read.csv(combined_path)
 
 # --- Colour palette ----------------------------------------------------------
 # 4 method families; shades within each family.
@@ -40,7 +42,8 @@ pkg_colours <- c(
   "anndataR (Reticulate to SCE)" = "#9ecae1",
   "zellkonverter (R)"            = "#a63603",
   "zellkonverter (Python)"       = "#fd8d3c",
-  "schard"                       = "#54278f",
+  "schard (SCE)"                 = "#54278f",
+  "schard (list)"                = "#9e9ac8",
   "anndata (memory)"             = "#252525",
   "anndata (backed)"             = "#969696"
 )
@@ -49,8 +52,10 @@ pkg_colours <- c(
 
 plot_data  <- timings[!is.na(timings$median), ]
 
-# subset results, remove 'anndata .*', 'anndataR (.* to SCE)'.
-plot_data <- plot_data[!grepl("anndata \\(.*\\)|anndataR \\(.* to SCE\\)", plot_data$package), ]
+if (final) {
+  # subset results, remove 'anndata .*', 'anndataR (.* to SCE)', 'schard (SCE)'
+  plot_data <- plot_data[!grepl("anndata \\(.*\\)|anndataR \\(.* to SCE\\)|schard \\(SCE\\)", plot_data$package), ]
+}
 
 last_points <- do.call(rbind, lapply(
   split(plot_data, plot_data$package),
@@ -81,8 +86,6 @@ p <- ggplot(
     expand = expansion(mult = c(0.03, 0.3))
   ) +
   scale_y_log10(labels = label_number(suffix = " s")) +
-  # scale_color_manual(values = pkg_colours) +
-  scale_color_brewer(palette = "Dark2") +
   labs(
     x     = "Number of cells",
     y     = "Elapsed time (median)",
@@ -91,6 +94,12 @@ p <- ggplot(
   ) +
   theme_bw() +
   theme(legend.position = "none")
+
+if (final) {
+  p <- p + scale_color_brewer(palette = "Dark2")
+} else {
+  p <- p + scale_color_manual(values = pkg_colours)
+}
 
 ggsave(file.path(plots_dir, "elapsed_time.pdf"), p, width = 9, height = 5)
 ggsave(file.path(plots_dir, "elapsed_time.png"), p, width = 9, height = 5, dpi = 300)

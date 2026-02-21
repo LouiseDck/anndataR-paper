@@ -155,15 +155,25 @@ inputs = [
 outputs = ["runtime_benchmark/timings/zellkonverter_python.csv"]
 description = "Benchmark zellkonverter Python/basilisk reader"
 
-[tasks.bench-schard]
-cmd = "Rscript runtime_benchmark/scripts/2_bench_schard.R"
+[tasks.bench-schard-sce]
+cmd = "Rscript runtime_benchmark/scripts/2_bench_schard.R --mode sce"
 depends-on = ["install-r-extras", "generate-data"]
 inputs = [
   "runtime_benchmark/scripts/2_bench_schard.R",
   "runtime_benchmark/datasets/*.h5ad"
 ]
-outputs = ["runtime_benchmark/timings/schard.csv"]
-description = "Benchmark schard reader"
+outputs = ["runtime_benchmark/timings/schard_sce.csv"]
+description = "Benchmark schard h5ad2sce reader"
+
+[tasks.bench-schard-list]
+cmd = "Rscript runtime_benchmark/scripts/2_bench_schard.R --mode list"
+depends-on = ["install-r-extras", "generate-data"]
+inputs = [
+  "runtime_benchmark/scripts/2_bench_schard.R",
+  "runtime_benchmark/datasets/*.h5ad"
+]
+outputs = ["runtime_benchmark/timings/schard_list.csv"]
+description = "Benchmark schard h5ad2list reader"
 
 # --- Python anndata control benchmark (memory + backed) ---------------------
 
@@ -199,7 +209,8 @@ depends-on = [
   "bench-anndataR-reticulate-sce",
   "bench-zellkonverter-R",
   "bench-zellkonverter-python",
-  "bench-schard",
+  "bench-schard-sce",
+  "bench-schard-list",
   "bench-anndata-memory",
   "bench-anndata-backed",
 ]
