@@ -18,14 +18,15 @@ if (length(csv_files) == 0) {
   stop("No CSV files found in ", timings_dir)
 }
 
+combined_path <- file.path(timings_dir, "timings.csv")
+
 timings <- do.call(rbind, lapply(csv_files, function(f) {
   message("Reading: ", f)
   read.csv(f)
 }))
-
-combined_path <- file.path(timings_dir, "timings.csv")
 write.csv(timings, combined_path, row.names = FALSE)
 message("Saved combined timings to: ", combined_path)
+# timings <- read.csv(combined_path)
 
 # --- Colour palette ----------------------------------------------------------
 # 4 method families; shades within each family.
@@ -71,11 +72,13 @@ p <- ggplot(
     show.legend   = FALSE
   ) +
   scale_x_log10(
+    breaks = c(100, 1e3, 1e4, 1e5, 1e6),
     labels = label_number(scale_cut = cut_short_scale()),
-    expand = expansion(mult = c(0.03, 0.45))
+    expand = expansion(mult = c(0.03, 0.3))
   ) +
   scale_y_log10(labels = label_number(suffix = " s")) +
   scale_color_manual(values = pkg_colours) +
+  # scale_color_brewer(palette = "Dark2") +
   labs(
     x     = "Number of cells",
     y     = "Elapsed time (median)",
