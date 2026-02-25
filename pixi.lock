@@ -15,7 +15,6 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/noarch/anndata-0.12.10-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/array-api-compat-1.13.0-pyhcf101f3_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/binutils_impl_linux-64-2.45.1-default_hfdba357_101.conda
-      - conda: https://conda.anaconda.org/bioconda/noarch/bioconductor-anndatar-1.0.1-r45hdfd78af_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/bwidget-1.10.1-ha770c72_1.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/bzip2-1.0.8-hda65f42_9.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/c-ares-1.34.6-hb03c661_0.conda
@@ -139,7 +138,6 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/noarch/r-pkgconfig-2.0.3-r45hc72bb7e_5.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/r-png-0.1_8-r45h6b2d295_3.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/r-profmem-0.7.0-r45hc72bb7e_1.conda
-      - conda: https://conda.anaconda.org/conda-forge/linux-64/r-purrr-1.2.1-r45h54b55ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/r-r6-2.6.1-r45hc72bb7e_1.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/r-rappdirs-0.3.4-r45h54b55ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/r-rcolorbrewer-1.1_3-r45h785f33e_4.conda
@@ -255,22 +253,6 @@ packages:
   purls: []
   size: 3744895
   timestamp: 1770267152681
-- conda: https://conda.anaconda.org/bioconda/noarch/bioconductor-anndatar-1.0.1-r45hdfd78af_0.conda
-  sha256: 163e0518e991183492ba21274603566d41a28f48e57ab95ca53fd550874bb152
-  md5: 27cb0aa33247a5c7277589a9e6ffff01
-  depends:
-  - r-base >=4.5,<4.6.0a0
-  - r-cli
-  - r-lifecycle
-  - r-matrix
-  - r-purrr
-  - r-r6 >=2.4.0
-  - r-reticulate >=1.41.1
-  - r-rlang
-  license: MIT + file LICENSE
-  purls: []
-  size: 1837712
-  timestamp: 1770474099488
 - conda: https://conda.anaconda.org/conda-forge/linux-64/bwidget-1.10.1-ha770c72_1.conda
   sha256: c88dd33c89b33409ebcd558d78fdc66a63c18f8b06e04d170668ffb6c8ecfabd
   md5: 983b92277d78c0d0ec498e460caa0e6d
@@ -1960,23 +1942,6 @@ packages:
   purls: []
   size: 65842
   timestamp: 1758189019962
-- conda: https://conda.anaconda.org/conda-forge/linux-64/r-purrr-1.2.1-r45h54b55ab_0.conda
-  sha256: cd296e0fc8a07eb4904c5936b3db93e985e3ff5a0699df7cc46ea809a89eb857
-  md5: 44746443d3a9d657a09a7c8879ca8f7d
-  depends:
-  - __glibc >=2.17,<3.0.a0
-  - libgcc >=14
-  - r-base >=4.5,<4.6.0a0
-  - r-cli >=3.4
-  - r-lifecycle >=1.0.3
-  - r-magrittr >=1.5
-  - r-rlang >=0.4.10
-  - r-vctrs >=0.5
-  license: MIT
-  license_family: MIT
-  purls: []
-  size: 547177
-  timestamp: 1768061060476
 - conda: https://conda.anaconda.org/conda-forge/noarch/r-r6-2.6.1-r45hc72bb7e_1.conda
   sha256: bd92e91332eba5f0c689583e80adec85ef272c4e0d0b36ee17cb7c11b5693cf2
   md5: 750802806d7d640c286ed8491bb395dc

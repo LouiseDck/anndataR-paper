@@ -34,12 +34,12 @@ message("Saved combined timings to: ", combined_path)
 # 4 method families; shades within each family.
 
 pkg_colours <- c(
-  "anndataR (InMemory)"          = "#08519c",
+  "anndataR (InMemory)"          = "#155da4",
   "anndataR (InMemory to SCE)"   = "#6baed6",
-  "anndataR (HDF5)"              = "#006d2c",
+  "anndataR (HDF5)"              = "#107237",
   "anndataR (HDF5 to SCE)"       = "#74c476",
-  "anndataR (Reticulate)"        = "#084594",
-  "anndataR (Reticulate to SCE)" = "#9ecae1",
+  "anndataR (Reticulate)"        = "#c61717",
+  "anndataR (Reticulate to SCE)" = "#e19e9e",
   "zellkonverter (R)"            = "#a63603",
   "zellkonverter (Python)"       = "#fd8d3c",
   "schard (SCE)"                 = "#54278f",

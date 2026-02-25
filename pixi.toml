@@ -24,9 +24,6 @@ r-remotes = "*"
 r-biocmanager = "*"
 r-svglite = "*"
 
-# Bioconductor packages (from bioconda)
-bioconductor-anndatar = ">=1.0"
-
 # System libraries needed to compile Bioconductor packages from source
 zlib = "*"
 
@@ -40,14 +37,23 @@ dummy-anndata = ">=0.0.3"
 [tasks.install-r-extras]
 cmd = """
   unset GITHUB_PAT && unset GITHUB_TOKEN && Rscript -e '
-    # zellkonverter has no R 4.5 build on bioconda yet, install from source
-    pkgs <- c("zellkonverter", "SummarizedExperiment", "HDF5Array")
-    missing <- pkgs[!sapply(pkgs, requireNamespace, quietly = TRUE)]
+    # Install stable Bioconductor packages not available on bioconda for R 4.5
+    bioc_pkgs <- c("zellkonverter", "SummarizedExperiment", "HDF5Array")
+    missing <- bioc_pkgs[!sapply(bioc_pkgs, requireNamespace, quietly = TRUE)]
     if (length(missing) > 0) {
       message("Installing from Bioconductor: ", paste(missing, collapse = ", "))
       BiocManager::install(missing, ask = FALSE, update = FALSE)
     } else {
       message("All Bioconductor packages already installed")
+    }
+
+    # Install anndataR devel (1.1.0) from GitHub (requires R >= 4.5)
+    if (!requireNamespace("anndataR", quietly = TRUE) ||
+        packageVersion("anndataR") < "1.1.0") {
+      message("Installing anndataR devel from GitHub ...")
+      remotes::install_github("scverse/anndataR", upgrade = "never")
+    } else {
+      message("anndataR ", packageVersion("anndataR"), " already installed")
     }
 
     if (!requireNamespace("schard", quietly = TRUE)) {
@@ -58,7 +64,7 @@ cmd = """
     }
   '
 """
-description = "Install R packages not yet on bioconda for R 4.5 (zellkonverter, schard)"
+description = "Install R packages from source: anndataR devel, zellkonverter stable, schard"
 
 [tasks.generate-data]
 cmd = "python runtime_benchmark/scripts/1_generate_datasets.py"
