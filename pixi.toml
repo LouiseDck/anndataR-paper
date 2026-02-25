@@ -228,7 +228,14 @@ description = "Run all benchmarks"
 cmd = "Rscript runtime_benchmark/scripts/3_plot.R"
 depends-on = ["bench"]
 inputs = ["runtime_benchmark/scripts/3_plot.R", "runtime_benchmark/timings/*.csv"]
-outputs = ["runtime_benchmark/plots/elapsed_time.pdf", "runtime_benchmark/plots/elapsed_time.png", "runtime_benchmark/plots/elapsed_time.svg"]
+outputs = [
+  "runtime_benchmark/plots/elapsed_time.pdf",
+  "runtime_benchmark/plots/elapsed_time.png",
+  "runtime_benchmark/plots/elapsed_time.svg",
+  "runtime_benchmark/plots/memory_usage.pdf",
+  "runtime_benchmark/plots/memory_usage.png",
+  "runtime_benchmark/plots/memory_usage.svg",
+]
 description = "Combine timings and generate plots"
 
 # --- Top-level task ---------------------------------------------------------
