@@ -1,0 +1,293 @@
+[workspace]
+name = "anndataR-paper-benchmark"
+version = "0.1.0"
+description = "Runtime benchmarks for the anndataR paper"
+channels = ["conda-forge", "bioconda"]
+platforms = ["linux-64"]
+
+[dependencies]
+# Python
+python = ">=3.12"
+anndata = ">=0.11"
+scipy = ">=1.14"
+
+# R base + CRAN packages
+r-base = ">=4.5"
+r-bench = "*"
+r-dplyr = "*"
+r-ggplot2 = "*"
+r-ggrepel = "*"
+r-optparse = "*"
+r-scales = "*"
+r-reticulate = "*"
+r-matrix = "*"
+r-patchwork = "*"
+r-purrr = "*"
+r-readr = "*"
+r-remotes = "*"
+r-biocmanager = "*"
+r-svglite = "*"
+
+# System libraries needed to compile Bioconductor packages from source
+zlib = "*"
+
+# LaTeX
+tectonic = "*"
+
+[pypi-dependencies]
+dummy-anndata = ">=0.0.3"
+
+# ---------------------------------------------------------------------------
+# Tasks – pixi orchestrates the full benchmark pipeline via `pixi run all`
+# ---------------------------------------------------------------------------
+
+[tasks.install-r-extras]
+cmd = """
+  unset GITHUB_PAT && unset GITHUB_TOKEN && Rscript -e '
+    # Install stable Bioconductor packages not available on bioconda for R 4.5
+    bioc_pkgs <- c("zellkonverter", "SummarizedExperiment", "HDF5Array")
+    missing <- bioc_pkgs[!sapply(bioc_pkgs, requireNamespace, quietly = TRUE)]
+    if (length(missing) > 0) {
+      message("Installing from Bioconductor: ", paste(missing, collapse = ", "))
+      BiocManager::install(missing, ask = FALSE, update = FALSE)
+    } else {
+      message("All Bioconductor packages already installed")
+    }
+
+    # Install anndataR devel (1.1.0) from GitHub (requires R >= 4.5)
+    if (!requireNamespace("anndataR", quietly = TRUE) ||
+        packageVersion("anndataR") < "1.1.0") {
+      message("Installing anndataR devel from GitHub ...")
+      remotes::install_github("scverse/anndataR", upgrade = "never")
+    } else {
+      message("anndataR ", packageVersion("anndataR"), " already installed")
+    }
+
+    if (!requireNamespace("schard", quietly = TRUE)) {
+      message("Installing schard from GitHub ...")
+      remotes::install_github("cellgeni/schard", upgrade = "never")
+    } else {
+      message("schard already installed")
+    }
+  '
+"""
+description = "Install R packages from source: anndataR devel, zellkonverter stable, schard"
+
+[tasks.generate-data]
+cmd = "python runtime_benchmark/scripts/1_generate_datasets.py"
+inputs = ["runtime_benchmark/scripts/1_generate_datasets.py"]
+outputs = [
+  "runtime_benchmark/datasets/d100.h5ad",
+  "runtime_benchmark/datasets/d200.h5ad",
+  "runtime_benchmark/datasets/d500.h5ad",
+  "runtime_benchmark/datasets/d1000.h5ad",
+  "runtime_benchmark/datasets/d2000.h5ad",
+  "runtime_benchmark/datasets/d5000.h5ad"
+]
+description = "Generate synthetic H5AD benchmark datasets"
+
+# --- Individual benchmarks (each in its own Rscript process) ----------------
+
+[tasks.bench-anndataR-inmemory]
+cmd = "Rscript runtime_benchmark/scripts/2_bench_anndataR.R --backend inmemory"
+depends-on = ["install-r-extras", "generate-data"]
+inputs = [
+  "runtime_benchmark/scripts/2_bench_anndataR.R",
+  "runtime_benchmark/datasets/*.h5ad"
+]
+outputs = ["runtime_benchmark/timings/anndataR_inmemory.csv"]
+description = "Benchmark anndataR InMemoryAnnData reader"
+
+[tasks.bench-anndataR-inmemory-sce]
+cmd = "Rscript runtime_benchmark/scripts/2_bench_anndataR.R --backend inmemory --sce"
+depends-on = ["install-r-extras", "generate-data"]
+inputs = [
+  "runtime_benchmark/scripts/2_bench_anndataR.R",
+  "runtime_benchmark/datasets/*.h5ad"
+]
+outputs = ["runtime_benchmark/timings/anndataR_inmemory2sce.csv"]
+description = "Benchmark anndataR InMemoryAnnData → SCE conversion"
+
+[tasks.bench-anndataR-hdf5]
+cmd = "Rscript runtime_benchmark/scripts/2_bench_anndataR.R --backend hdf5"
+depends-on = ["install-r-extras", "generate-data"]
+inputs = [
+  "runtime_benchmark/scripts/2_bench_anndataR.R",
+  "runtime_benchmark/datasets/*.h5ad"
+]
+outputs = ["runtime_benchmark/timings/anndataR_hdf5.csv"]
+description = "Benchmark anndataR HDF5AnnData reader"
+
+[tasks.bench-anndataR-hdf5-sce]
+cmd = "Rscript runtime_benchmark/scripts/2_bench_anndataR.R --backend hdf5 --sce"
+depends-on = ["install-r-extras", "generate-data"]
+inputs = [
+  "runtime_benchmark/scripts/2_bench_anndataR.R",
+  "runtime_benchmark/datasets/*.h5ad"
+]
+outputs = ["runtime_benchmark/timings/anndataR_hdf52sce.csv"]
+description = "Benchmark anndataR HDF5AnnData → SCE conversion"
+
+[tasks.bench-anndataR-reticulate]
+cmd = "Rscript runtime_benchmark/scripts/2_bench_anndataR.R --backend reticulate"
+depends-on = ["install-r-extras", "generate-data"]
+inputs = [
+  "runtime_benchmark/scripts/2_bench_anndataR.R",
+  "runtime_benchmark/datasets/*.h5ad"
+]
+outputs = ["runtime_benchmark/timings/anndataR_reticulate.csv"]
+description = "Benchmark anndataR ReticulateAnnData (via reticulate/anndata)"
+
+[tasks.bench-anndataR-reticulate-sce]
+cmd = "Rscript runtime_benchmark/scripts/2_bench_anndataR.R --backend reticulate --sce"
+depends-on = ["install-r-extras", "generate-data"]
+inputs = [
+  "runtime_benchmark/scripts/2_bench_anndataR.R",
+  "runtime_benchmark/datasets/*.h5ad"
+]
+outputs = ["runtime_benchmark/timings/anndataR_reticulate2sce.csv"]
+description = "Benchmark anndataR ReticulateAnnData → SCE conversion"
+
+[tasks.bench-zellkonverter-R]
+cmd = "Rscript runtime_benchmark/scripts/2_bench_zellkonverter.R --backend R"
+depends-on = ["install-r-extras", "generate-data"]
+inputs = [
+  "runtime_benchmark/scripts/2_bench_zellkonverter.R",
+  "runtime_benchmark/datasets/*.h5ad"
+]
+outputs = ["runtime_benchmark/timings/zellkonverter_R.csv"]
+description = "Benchmark zellkonverter R reader"
+
+[tasks.bench-zellkonverter-python]
+cmd = "Rscript runtime_benchmark/scripts/2_bench_zellkonverter.R --backend python"
+depends-on = ["install-r-extras", "generate-data"]
+inputs = [
+  "runtime_benchmark/scripts/2_bench_zellkonverter.R",
+  "runtime_benchmark/datasets/*.h5ad"
+]
+outputs = ["runtime_benchmark/timings/zellkonverter_python.csv"]
+description = "Benchmark zellkonverter Python/basilisk reader"
+
+[tasks.bench-schard-sce]
+cmd = "Rscript runtime_benchmark/scripts/2_bench_schard.R --mode sce"
+depends-on = ["install-r-extras", "generate-data"]
+inputs = [
+  "runtime_benchmark/scripts/2_bench_schard.R",
+  "runtime_benchmark/datasets/*.h5ad"
+]
+outputs = ["runtime_benchmark/timings/schard_sce.csv"]
+description = "Benchmark schard h5ad2sce reader"
+
+[tasks.bench-schard-list]
+cmd = "Rscript runtime_benchmark/scripts/2_bench_schard.R --mode list"
+depends-on = ["install-r-extras", "generate-data"]
+inputs = [
+  "runtime_benchmark/scripts/2_bench_schard.R",
+  "runtime_benchmark/datasets/*.h5ad"
+]
+outputs = ["runtime_benchmark/timings/schard_list.csv"]
+description = "Benchmark schard h5ad2list reader"
+
+# --- Python anndata control benchmark (memory + backed) ---------------------
+
+[tasks.bench-anndata-memory]
+cmd = "python runtime_benchmark/scripts/2_bench_anndata.py"
+depends-on = ["generate-data"]
+inputs = [
+  "runtime_benchmark/scripts/2_bench_anndata.py",
+  "runtime_benchmark/datasets/*.h5ad"
+]
+outputs = ["runtime_benchmark/timings/anndata_memory.csv"]
+description = "Benchmark Python anndata in-memory reader (control)"
+
+[tasks.bench-anndata-backed]
+cmd = "python runtime_benchmark/scripts/2_bench_anndata.py --backed"
+depends-on = ["generate-data"]
+inputs = [
+  "runtime_benchmark/scripts/2_bench_anndata.py",
+  "runtime_benchmark/datasets/*.h5ad"
+]
+outputs = ["runtime_benchmark/timings/anndata_backed.csv"]
+description = "Benchmark Python anndata backed/lazy HDF5 reader (control)"
+
+# --- Aggregate benchmark task -----------------------------------------------
+
+[tasks.bench]
+depends-on = [
+  "bench-anndataR-inmemory",
+  "bench-anndataR-inmemory-sce",
+  "bench-anndataR-hdf5",
+  "bench-anndataR-hdf5-sce",
+  "bench-anndataR-reticulate",
+  "bench-anndataR-reticulate-sce",
+  "bench-zellkonverter-R",
+  "bench-zellkonverter-python",
+  "bench-schard-sce",
+  "bench-schard-list",
+  "bench-anndata-memory",
+  "bench-anndata-backed",
+]
+description = "Run all benchmarks"
+
+# --- Plot -------------------------------------------------------------------
+
+[tasks.plot]
+cmd = "Rscript runtime_benchmark/scripts/3_plot.R"
+depends-on = ["bench"]
+inputs = ["runtime_benchmark/scripts/3_plot.R", "runtime_benchmark/timings/*.csv"]
+outputs = [
+  "runtime_benchmark/plots/elapsed_time.pdf",
+  "runtime_benchmark/plots/elapsed_time.png",
+  "runtime_benchmark/plots/elapsed_time.svg",
+  "runtime_benchmark/plots/memory_usage.pdf",
+  "runtime_benchmark/plots/memory_usage.png",
+  "runtime_benchmark/plots/memory_usage.svg",
+]
+description = "Combine timings and generate plots"
+
+# --- Session info -----------------------------------------------------------
+
+[tasks.session-info]
+cmd = "Rscript runtime_benchmark/scripts/4_session_info.R"
+inputs = ["runtime_benchmark/scripts/4_session_info.R"]
+outputs = ["runtime_benchmark/session_info.txt"]
+description = "Collect R/Python package versions, pixi version, and machine specs"
+
+# --- Render paper -----------------------------------------------------------
+
+[tasks.render-supplementary]
+cmd = """
+  cp runtime_benchmark/plots/combined_plot.pdf paper/ && \
+  cd paper && \
+  tectonic supplementary.tex
+"""
+inputs = [
+  "paper/supplementary.tex",
+  "runtime_benchmark/plots/combined_plot.pdf",
+  "paper/class_diagram.pdf",
+  "paper/AnnData-SCE.pdf",
+  "paper/AnnData-Seurat.pdf",
+]
+outputs = ["paper/supplementary.pdf"]
+description = "Render supplementary material PDF"
+
+[tasks.render-paper]
+cmd = """
+  cd paper && \
+  tectonic anndataR.tex
+"""
+depends-on = ["render-supplementary"]
+inputs = [
+  "paper/anndataR.tex",
+  "paper/reference.bib",
+  "paper/oup-authoring-template.cls",
+  "paper/anndataR_figure.pdf",
+]
+outputs = ["paper/anndataR.pdf"]
+description = "Render main paper PDF (with bibliography and cross-references)"
+
+# --- Top-level task ---------------------------------------------------------
+
+[tasks.all]
+depends-on = ["plot", "session-info", "render-paper"]
+description = "Run full pipeline: generate data → benchmark → plot → render"

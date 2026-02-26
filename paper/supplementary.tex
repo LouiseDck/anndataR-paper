@@ -7,6 +7,7 @@
 
 \usepackage{adjustbox}
 \usepackage{array}
+\usepackage{float}
 
 \newcolumntype{R}[2]{%
     >{\adjustbox{angle=#1,lap=\width-(#2)}\bgroup}%
@@ -44,11 +45,28 @@
 \newpage
 
 \section*{Supplementary Figure 4}
-\begin{figure*}[h!]
+\begin{figure}[H]
     \centering
-    \includegraphics[width=1\textwidth]{user_time.pdf}
-    \caption{Results of a benchmark performed to compare runtime of reading an H5AD file. We compared anndataR against 3 other approaches: the two other packages using a native HDF5 reader (schard and zellkonverter with the native reader option) and a popular tool, zellkonverter with the python reader. The benchmark was performed using datasets containing 20 000 genes, and 100, 1000, 10 000, 100 000, 250 000 and 500 000 cells, with a density of 5\%.}
-\end{figure*}
+    \includegraphics[height=0.62\textheight, keepaspectratio]{combined_plot.pdf}
+    \caption{Runtime and memory benchmark for reading an H5AD file and computing the sum of the expression matrix.
+    \textbf{Top:} Median elapsed time.
+    \textbf{Bottom:} Maximum memory allocated.
+    We compared three anndataR backends (InMemory, HDF5, and Reticulate),
+    two zellkonverter backends (native R reader and Python/basilisk reader),
+    and schard (list export).
+    Synthetic datasets were generated with \texttt{dummy\_anndata} containing 20\,000 genes
+    and between 100 and 1\,000\,000 cells at approximately logarithmic intervals,
+    with a sparse expression matrix (density~5\%).
+    Each benchmark iteration reads the H5AD file and computes the sum of the X matrix;
+    anndataR and schard access the X slot directly, whereas zellkonverter returns a
+    SingleCellExperiment object and is therefore expected to incur slightly higher overhead.
+    Timings report the median of at least 3~iterations.
+    Benchmarks were run on a machine with an AMD Ryzen~9 5950X (16~cores, 32~threads)
+    and 126\,GiB RAM, running Fedora Linux~42.
+    Software versions: R~4.5.2, Python~3.13.11, anndataR~1.1.0,
+    zellkonverter~1.20.1, schard~0.0.1, anndata~0.11.4, rhdf5~2.54.1.}
+    \label{fig:benchmark}
+\end{figure}
 
 \newpage
 
