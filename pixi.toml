@@ -276,6 +276,7 @@ cmd = """
   cd paper && \
   tectonic anndataR.tex
 """
+depends-on = ["render-supplementary"]
 inputs = [
   "paper/anndataR.tex",
   "paper/reference.bib",
@@ -288,5 +289,5 @@ description = "Render main paper PDF (with bibliography and cross-references)"
 # --- Top-level task ---------------------------------------------------------
 
 [tasks.all]
-depends-on = ["plot", "session-info", "render-paper", "render-supplementary"]
+depends-on = ["plot", "session-info", "render-paper"]
 description = "Run full pipeline: generate data → benchmark → plot → render"

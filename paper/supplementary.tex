@@ -7,6 +7,7 @@
 
 \usepackage{adjustbox}
 \usepackage{array}
+\usepackage{float}
 
 \newcolumntype{R}[2]{%
     >{\adjustbox{angle=#1,lap=\width-(#2)}\bgroup}%
@@ -44,9 +45,9 @@
 \newpage
 
 \section*{Supplementary Figure 4}
-\begin{figure*}[h!]
+\begin{figure}[H]
     \centering
-    \includegraphics[width=1\textwidth]{combined_plot.pdf}
+    \includegraphics[height=0.62\textheight, keepaspectratio]{combined_plot.pdf}
     \caption{Runtime and memory benchmark for reading an H5AD file and computing the sum of the expression matrix.
     \textbf{Top:} Median elapsed time.
     \textbf{Bottom:} Maximum memory allocated.
@@ -65,7 +66,7 @@
     Software versions: R~4.5.2, Python~3.13.11, anndataR~1.1.0,
     zellkonverter~1.20.1, schard~0.0.1, anndata~0.11.4, rhdf5~2.54.1.}
     \label{fig:benchmark}
-\end{figure*}
+\end{figure}
 
 \newpage
 

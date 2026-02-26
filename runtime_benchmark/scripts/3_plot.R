@@ -183,6 +183,6 @@ ggsave(file.path(plots_dir, "memory_usage.svg"), q, width = 9, height = 5)
 
 pq <- p / q + plot_layout(guides = "collect") & theme(legend.position = "bottom")
 
-ggsave(file.path(plots_dir, "combined_plot.pdf"), pq, width = 9, height = 10)
-ggsave(file.path(plots_dir, "combined_plot.png"), pq, width = 9, height = 10, dpi = 300)
-ggsave(file.path(plots_dir, "combined_plot.svg"), pq, width = 9, height = 10)
+ggsave(file.path(plots_dir, "combined_plot.pdf"), pq, width = 8, height = 8)
+ggsave(file.path(plots_dir, "combined_plot.png"), pq, width = 8, height = 8, dpi = 300)
+ggsave(file.path(plots_dir, "combined_plot.svg"), pq, width = 8, height = 9)
