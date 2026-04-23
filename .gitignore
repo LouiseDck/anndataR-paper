@@ -11,3 +11,6 @@
 *.log
 *.out
 *.synctex.gz
+
+# generated submission zip
+paper/zip

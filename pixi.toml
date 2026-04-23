@@ -286,6 +286,31 @@ inputs = [
 outputs = ["paper/anndataR.pdf"]
 description = "Render main paper PDF (with bibliography and cross-references)"
 
+# --- Build submission source zip -------------------------------------------
+
+[tasks.build-zip]
+cmd = """
+  rm -f paper/zip/source.zip && \
+  mkdir -p paper/zip/doc && \
+  cp paper/doc/* paper/zip/doc/ && \
+  cp paper/anndataR.tex paper/zip/anndataR.tex && \
+  cp paper/reference.bib paper/zip/reference.bib && \
+  cp paper/supplementary.tex paper/zip/supplementary.tex && \
+  cp paper/oup-authoring-template.cls paper/zip/oup-authoring-template.cls && \
+  cd paper/zip && \
+  zip -r source.zip anndataR.tex reference.bib supplementary.tex oup-authoring-template.cls doc/
+"""
+depends-on = ["render-paper"]
+inputs = [
+  "paper/anndataR.tex",
+  "paper/reference.bib",
+  "paper/supplementary.tex",
+  "paper/oup-authoring-template.cls",
+  "paper/zip/doc/oup-authoring-template-doc.tex",
+]
+outputs = ["paper/zip/source.zip"]
+description = "Build submission source ZIP from paper LaTeX sources"
+
 # --- Top-level task ---------------------------------------------------------
 
 [tasks.all]
