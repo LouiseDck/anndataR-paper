@@ -21,8 +21,8 @@
 %%%CONTEMPORARY%%%
 % \documentclass[numsec,webpdf,modern,large]{oup-authoring-template}
 % \documentclass[unnumsec,webpdf,contemporary,large]{oup-authoring-template}%
-\documentclass[numsec,webpdf,modern,large,namedate]{oup-authoring-template}
-% \documentclass[unnumsec,webpdf,modern,large,namedate]{oup-authoring-template}% uncomment this line for author year citations and comment the above
+% \documentclass[numsec,webpdf,modern,large,namedate]{oup-authoring-template}
+\documentclass[unnumsec,webpdf,modern,large,namedate]{oup-authoring-template}% author year citations
 
 \newcommand\mydots{\ifmmode\ldots\else\makebox[1em][c]{.\hfil.\hfil.}\fi}
 \def\thickhline{\noalign{\hrule height.8pt}}
@@ -159,7 +159,7 @@ To address this, two other core data structures within the scverse ecosystem hav
 For single-cell transcriptomics analysis, there are many software packages that facilitate the conversion between different objects (Table \ref{tab:related}).
 They use a com\-bi\-na\-tion of approaches to transfer data between programming languages: they either use a so-called foreign function interface (FFI) to transfer information between languages during an interac\-tive session or they write and read the data to and from disk.
 
-FFIs like reticulate \citep{reticulate} or rpy2 \citep{rpy2} allow 
+FFIs like reticulate (\url{https://CRAN.R-project.org/package=reticulate}) or rpy2 (\url{https://github.com/rpy2/rpy2}) allow 
 a program written in one language to call or use functions written in another language. 
 This allows users to flexibly call foreign functions, transferring data from the native language 
 to the foreign language as needed. However, such an approach faces several limitations. It is 
@@ -178,17 +178,17 @@ Software packages that use FFI to facilitate interaction with single-cell specif
 \textbf{Tool} & \textbf{Prog. lan\-guage} & \textbf{FFI} & \textbf{File format} & \textbf{Conversion} \\ \thickhline
 dynverse/ anndata \citep{dynverseanndata} & R & \checkmark &  &  \\ \hline
 anndata2ri \citep{anndata2ri} & Python & \checkmark &  & AnnData$\leftrightarrow$SCE \\ \hline
-Loom \citep{loompy, loomR} & R, Python &  & Loom (h5) &  \\ \hline
+Loom & R, Python &  & Loom (h5) &  \\ \hline
 scDIOR \citep{scdior} & R, Python &  & scDIOR (h5) & AnnData$\leftrightarrow$SCE \ AnnData$\leftrightarrow$Seurat \\ \hline
-BiocPy with rds2py \citep{rds2py} & Python &  &  &  \\ \hline
-alabaster dolomite \citep{alabaster, dolomite} & R, Python &  & HDF5, csv &  \\ \hline
-SeuratDisk \citep{seuratdisk} & R &  & h5Seurat & Seurat$\leftrightarrow$AnnData \\ \hline
+BiocPy with rds2py & Python &  &  &  \\ \hline
+alabaster \citep{alabaster} dolomite & R, Python &  & HDF5, csv &  \\ \hline
+SeuratDisk & R &  & h5Seurat & Seurat$\leftrightarrow$AnnData \\ \hline
 zellkonverter \citep{zellkonverter} & R & \checkmark &  & AnnData$\leftrightarrow$SCE \\ \hline
 sceasy \citep{sceasy} & R & \checkmark &  & Converts between AnnData, SCE, Seurat and Loom \\ \hline
-schard \citep{schard} & R &  &  & Converts between AnnData, SCE and Seurat\tablefootnote{Incomplete: only reads and converts X, obs, var, obsm} \\ \hline
+schard & R &  &  & Converts between AnnData, SCE and Seurat\tablefootnote{Incomplete: only reads and converts X, obs, var, obsm} \\ \hline
 anndataR (this paper) & R &  &  & Converts between AnnData, SCE and Seurat \\ \hline
 SCUBA \citep{scuba} & R & \checkmark & provides API &  \\ \hline
-scKirby \citep{sckirby} & R & \checkmark &  & Converts between AnnData, SCE, Seurat and Loom\tablefootnote{Combines conversion functionality from other packages} \\ \thickhline
+scKirby & R & \checkmark &  & Converts between AnnData, SCE, Seurat and Loom\tablefootnote{Combines conversion functionality from other packages} \\ \thickhline
 \end{tabular}
 \caption{Overview of packages aiming to provide some form of inter\-oper\-ability between AnnData, SingleCellExperiment and Seurat objects}
 \label{tab:related}
@@ -196,10 +196,10 @@ scKirby \citep{sckirby} & R & \checkmark &  & Converts between AnnData, SCE, Seu
 
 The second approach, working on an object that gets inter\-mediately stored on disk, requires a 
 standard on-disk format accessible from both languages. A shared standard, loom, was introduced 
-but was not fully taken up by the community. The AnnData HDF5-based \citep{hdf5} H5AD format has 
+but was not fully taken up by the community. The AnnData HDF5-based (\url{https://github.com/HDFGroup/hdf5}) H5AD format has 
 become the de facto standard for Python users and in some public repositories while R objects are
-commonly saved as non-interoperable binary Rds files. To address this, packages such as rds2py \citep{rds2py}, alabaster \citep{alabaster} and dolomite \citep{dolomite} provide ways to read and write SingleCellExperiment objects in Python. 
-SeuratDisk \citep{seuratdisk} provides a way to save Seurat objects as interoperable HDF5 files. 
+commonly saved as non-interoperable binary Rds files. To address this, packages such as rds2py (\url{https://github.com/BiocPy/rds2py}), alabaster \citep{alabaster} and dolomite (\url{https://github.com/ArtifactDB/dolomite-base}) provide ways to read and write SingleCellExperiment objects in Python. 
+SeuratDisk (\url{https://github.com/mojaveazure/seurat-disk}) provides a way to save Seurat objects as interoperable HDF5 files. 
 
 Other packages, including sceasy \citep{sceasy} and zellkonverter \citep{zellkonverter}, 
 combine these approaches to make H5AD files useable in R. They allow reading and writing of H5AD
