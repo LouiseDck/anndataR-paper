@@ -159,7 +159,7 @@ To address this, two other core data structures within the scverse ecosystem hav
 For single-cell transcriptomics analysis, there are many software packages that facilitate the conversion between different objects (Table \ref{tab:related}).
 They use a com\-bi\-na\-tion of approaches to transfer data between programming languages: they either use a so-called foreign function interface (FFI) to transfer information between languages during an interac\-tive session or they write and read the data to and from disk.
 
-FFIs like reticulate\footnote{\url{https://CRAN.R-project.org/package=reticulate}} or rpy2\footnote{\url{https://github.com/rpy2/rpy2}} allow 
+FFIs like reticulate (\url{https://CRAN.R-project.org/package=reticulate}) or rpy2 (\url{https://github.com/rpy2/rpy2}) allow 
 a program written in one language to call or use functions written in another language. 
 This allows users to flexibly call foreign functions, transferring data from the native language 
 to the foreign language as needed. However, such an approach faces several limitations. It is 
@@ -196,10 +196,10 @@ scKirby & R & \checkmark &  & Converts between AnnData, SCE, Seurat and Loom\tab
 
 The second approach, working on an object that gets inter\-mediately stored on disk, requires a 
 standard on-disk format accessible from both languages. A shared standard, loom, was introduced 
-but was not fully taken up by the community. The AnnData HDF5-based\footnote{\url{https://github.com/HDFGroup/hdf5}} H5AD format has 
+but was not fully taken up by the community. The AnnData HDF5-based (\url{https://github.com/HDFGroup/hdf5}) H5AD format has 
 become the de facto standard for Python users and in some public repositories while R objects are
-commonly saved as non-interoperable binary Rds files. To address this, packages such as rds2py\footnote{\url{https://github.com/BiocPy/rds2py}}, alabaster \citep{alabaster} and dolomite\footnote{\url{https://github.com/ArtifactDB/dolomite-base}} provide ways to read and write SingleCellExperiment objects in Python. 
-SeuratDisk\footnote{\url{https://github.com/mojaveazure/seurat-disk}} provides a way to save Seurat objects as interoperable HDF5 files. 
+commonly saved as non-interoperable binary Rds files. To address this, packages such as rds2py (\url{https://github.com/BiocPy/rds2py}), alabaster \citep{alabaster} and dolomite (\url{https://github.com/ArtifactDB/dolomite-base}) provide ways to read and write SingleCellExperiment objects in Python. 
+SeuratDisk (\url{https://github.com/mojaveazure/seurat-disk}) provides a way to save Seurat objects as interoperable HDF5 files. 
 
 Other packages, including sceasy \citep{sceasy} and zellkonverter \citep{zellkonverter}, 
 combine these approaches to make H5AD files useable in R. They allow reading and writing of H5AD
