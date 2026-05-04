@@ -30,6 +30,7 @@ r-svglite = "*"
 
 # System libraries needed to compile Bioconductor packages from source
 zlib = "*"
+ghostscript = "*"
 
 # LaTeX
 tectonic = "*"
@@ -257,16 +258,16 @@ description = "Collect R/Python package versions, pixi version, and machine spec
 
 [tasks.render-supplementary]
 cmd = """
-  cp runtime_benchmark/plots/combined_plot.pdf paper/ && \
+  cp runtime_benchmark/plots/combined_plot.pdf paper/figures/ && \
   cd paper && \
   tectonic supplementary.tex
 """
 inputs = [
   "paper/supplementary.tex",
   "runtime_benchmark/plots/combined_plot.pdf",
-  "paper/class_diagram.pdf",
-  "paper/AnnData-SCE.pdf",
-  "paper/AnnData-Seurat.pdf",
+  "paper/figures/class_diagram.pdf",
+  "paper/figures/AnnData-SCE.pdf",
+  "paper/figures/AnnData-Seurat.pdf",
 ]
 outputs = ["paper/supplementary.pdf"]
 description = "Render supplementary material PDF"
@@ -281,7 +282,7 @@ inputs = [
   "paper/anndataR.tex",
   "paper/reference.bib",
   "paper/oup-authoring-template.cls",
-  "paper/anndataR_figure.pdf",
+  "paper/figures/anndataR_figure.pdf",
 ]
 outputs = ["paper/anndataR.pdf"]
 description = "Render main paper PDF (with bibliography and cross-references)"
@@ -311,8 +312,17 @@ inputs = [
 outputs = ["paper/zip/source.zip"]
 description = "Build submission source ZIP from paper LaTeX sources"
 
+# --- Convert figures to 1200 DPI PNG ----------------------------------------
+
+[tasks.convert-figures]
+cmd = "gs -dBATCH -dNOPAUSE -dSAFER -sDEVICE=png16m -r1200 -sOutputFile=paper/figures/anndataR_figure.png paper/figures/anndataR_figure.pdf"
+depends-on = ["render-paper"]
+inputs = ["paper/figures/anndataR_figure.pdf"]
+outputs = ["paper/figures/anndataR_figure.png"]
+description = "Convert main paper figure to 1200 DPI PNG"
+
 # --- Top-level task ---------------------------------------------------------
 
 [tasks.all]
-depends-on = ["plot", "session-info", "render-paper"]
+depends-on = ["plot", "session-info", "render-paper", "build-zip", "convert-figures"]
 description = "Run full pipeline: generate data → benchmark → plot → render"
